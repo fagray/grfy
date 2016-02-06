@@ -14,7 +14,7 @@
 		{
 			$this->db->select('*');
 			$this->db->from('cs_projects as p');
-			$this->db->where('p.status = "approved"');
+			$this->db->where('p.project_status = "approved"');
 			$this->db->join('cs_categories c', 'c.cat_id = p.cat_id','left');
 			$this->db->join('cs_greenies  g', 'g.greenie_id = p.user_id','left');
 			// $this->db->join('cs_categories  as c', 'c.cat_id = p.cat_id','left');
@@ -30,7 +30,7 @@
 		{
 			$this->db->select('*');
 			$this->db->from('cs_projects as p');
-			$this->db->where('p.status = "pending"');
+			$this->db->where('p.project_status = "pending"');
 			$this->db->join('cs_greenies g', 'g.greenie_id = p.user_id','left');
 			$this->db->join('cs_categories c', 'c.cat_id = p.cat_id','left');
 			$projects = $this->db->get()->result_object();
@@ -45,7 +45,7 @@
 		{
 			$this->db->select('*');
 			$this->db->from('cs_projects as p');
-			$this->db->where('p.status = "draft"');
+			$this->db->where('p.project_status = "draft"');
 			$this->db->join('cs_greenies g', 'g.greenie_id = p.user_id','left');
 			$this->db->join('cs_categories c', 'c.cat_id = p.cat_id','left');
 			$projects = $this->db->get()->result_object();
@@ -61,7 +61,7 @@
 		{
 			$this->db->select('*');
 			$this->db->from('cs_projects as p');
-			$this->db->where('p.status = "approved"');
+			$this->db->where('p.project_status = "approved"');
 			$this->db->join('cs_greenie_projects gp', 'gp.project_id = p.proj_id','left');
 			$this->db->join('cs_greenies g', 'g.greenie_id = p.user_id','left');
 			$this->db->join('cs_categories c', 'c.cat_id = p.cat_id','left');
@@ -204,11 +204,34 @@
 			return false;
 		}
 
-		
+		/**
+		 * Grab projects based on selection.
+		 * @param  int $limit  number of entries
+		 * @param  int $option 0 = normal, 1 = featured, 2 = top pick
+		 * @return mixed         
+		 */
+		public function get_selection($limit, $option)
+		{
+			$this->db->select('*');
+			$this->db->from('cs_projects as p');
+			$this->db->where("p.project_status","approved"); // 2 = top picks
+			$this->db->where("p.selection", $option); // 2 = top picks
+			$this->db->join('cs_greenies g', 'g.greenie_id = p.user_id','left');
+			$this->db->join('cs_categories c', 'c.cat_id = p.cat_id','left');
+			$this->db->limit($limit);
+			$projects = $this->db->get()->result_object();
+			return $projects;
+			
+		}
 
+		public function update_project($proj_id,$params)
+		{
+			$this->db->where('proj_id', $proj_id);
+			return $this->db->update($this->_table,$params);
+		}
 
-
-
+	
+	
 
 
 		
